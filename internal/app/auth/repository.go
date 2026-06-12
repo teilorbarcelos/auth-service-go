@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
-	"github.com/teilorbarcelos/auth-service-go/internal/core/repository"
 	"gorm.io/gorm"
 )
 
@@ -14,18 +13,16 @@ type Repository interface {
 }
 
 type authRepository struct {
-	repository.BaseRepository[models.User]
+	db *gorm.DB
 }
 
 func NewRepository(db *gorm.DB) Repository {
-	return &authRepository{
-		BaseRepository: *repository.NewBaseRepository[models.User](db),
-	}
+	return &authRepository{db: db}
 }
 
 func (r *authRepository) FindByEmail(ctx context.Context, email string) (*models.User, error) {
 	var user models.User
-	err := r.DB.WithContext(ctx).
+	err := r.db.WithContext(ctx).
 		Preload("Auth").
 		Preload("Role").
 		Preload("Role.RoleFeature").
@@ -39,5 +36,5 @@ func (r *authRepository) FindByEmail(ctx context.Context, email string) (*models
 }
 
 func (r *authRepository) UpdateAuth(ctx context.Context, authID string, updates map[string]interface{}) error {
-	return r.DB.WithContext(ctx).Model(&models.Auth{}).Where("id = ?", authID).Updates(updates).Error
+	return r.db.WithContext(ctx).Model(&models.Auth{}).Where("id = ?", authID).Updates(updates).Error
 }

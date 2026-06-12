@@ -38,15 +38,12 @@ var (
 		return gorm.Open(dialector, config)
 	}
 	autoMigrate = func(ctx context.Context, db *gorm.DB) error {
-		db.Exec("CREATE SCHEMA IF NOT EXISTS audit")
 		return db.WithContext(ctx).AutoMigrate(
-			&models.AuditLog{},
 			&models.Role{},
 			&models.Feature{},
 			&models.RoleFeature{},
 			&models.Auth{},
 			&models.User{},
-			&models.Product{},
 		)
 	}
 )

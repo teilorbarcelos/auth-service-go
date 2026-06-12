@@ -10,27 +10,18 @@ import (
 	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
 	"github.com/teilorbarcelos/auth-service-go/internal/infra/session"
 	"github.com/teilorbarcelos/auth-service-go/pkg/cache"
-	"github.com/teilorbarcelos/auth-service-go/pkg/email"
 	"github.com/teilorbarcelos/auth-service-go/pkg/security"
-	"crypto/rand"
-	"math/big"
 )
-
-var randReader = rand.Reader
 
 type Service interface {
 	Login(ctx context.Context, email, password string) (*LoginResponse, error)
 	GetMe(ctx context.Context, email string) (*LoginResponse, error)
 	RefreshToken(ctx context.Context, refreshToken string) (*LoginResponse, error)
-	RequestPasswordReset(ctx context.Context, email string) error
-	ValidateResetToken(ctx context.Context, email, token string) (bool, error)
-	ResetPassword(ctx context.Context, email, token, newPassword string) error
 }
 
 type authService struct {
 	repo                 Repository
 	sessionManager       session.SessionStore
-	emailProvider        email.Provider
 	GenerateToken        func(id, email, idRole string, permissions []security.Permission, sessionVersion int) (string, error)
 	GenerateRefreshToken func(id, email, idRole string) (string, error)
 	HashPassword         func(password string) (string, error)
@@ -40,7 +31,6 @@ func NewService(repo Repository, sessionMgr session.SessionStore) Service {
 	return &authService{
 		repo:                 repo,
 		sessionManager:       sessionMgr,
-		emailProvider:        email.NewMockEmailProvider(),
 		GenerateToken:        security.GenerateToken,
 		GenerateRefreshToken: security.GenerateRefreshToken,
 		HashPassword:         security.HashPassword,
@@ -114,7 +104,6 @@ func (s *authService) RefreshToken(ctx context.Context, refreshToken string) (*L
 		return nil, domainerr.ErrInvalidCredentials
 	}
 
-	// Verificar se a sessão de refresh ainda existe no Redis
 	tokenHash := security.SHA256(refreshToken)
 	sessionKey := fmt.Sprintf("session:role:%s:user:%s:refresh:%s", claims.RoleID, claims.UserID, tokenHash)
 	exists, err := cache.RedisClient.Exists(ctx, sessionKey).Result()
@@ -132,86 +121,6 @@ func (s *authService) RefreshToken(ctx context.Context, refreshToken string) (*L
 	}
 
 	return s.prepareAuthResponse(ctx, user)
-}
-
-func (s *authService) RequestPasswordReset(ctx context.Context, emailStr string) error {
-	user, err := s.repo.FindByEmail(ctx, emailStr)
-	if err != nil || user.Auth == nil {
-		// Retornar sucesso silencioso por segurança para evitar enumeração de usuários
-		return nil
-	}
-
-	token, _ := generateRandom6DigitToken()
-	expiration := time.Now().Add(15 * time.Minute)
-
-	updates := map[string]interface{}{
-		"request_password_token":      token,
-		"request_password_expiration": expiration,
-	}
-
-	if err := s.repo.UpdateAuth(ctx, user.Auth.ID, updates); err != nil {
-		return err
-	}
-
-	return s.emailProvider.SendEmail(email.SendEmailParams{
-		To:      emailStr,
-		Subject: "Recuperação de Senha",
-		Context: map[string]interface{}{
-			"name":  user.Name,
-			"token": token,
-		},
-	})
-}
-
-func (s *authService) ValidateResetToken(ctx context.Context, emailStr, token string) (bool, error) {
-	user, err := s.repo.FindByEmail(ctx, emailStr)
-	if err != nil {
-		return false, domainerr.ErrUserNotFound
-	}
-
-	if user.Auth == nil || user.Auth.RequestPasswordToken == nil || *user.Auth.RequestPasswordToken != token {
-		return false, domainerr.ErrInvalidToken
-	}
-
-	if user.Auth.RequestPasswordExpiration != nil && user.Auth.RequestPasswordExpiration.Before(time.Now()) {
-		return false, domainerr.ErrTokenExpired
-	}
-
-	return true, nil
-}
-
-func (s *authService) ResetPassword(ctx context.Context, emailStr, token, newPassword string) error {
-	user, err := s.repo.FindByEmail(ctx, emailStr)
-	if err != nil {
-		return domainerr.ErrUserNotFound
-	}
-
-	valid, err := s.ValidateResetToken(ctx, emailStr, token)
-	if err != nil || !valid {
-		return err
-	}
-
-	hashedPassword, err := s.HashPassword(newPassword)
-	if err != nil {
-		return domainerr.ErrInternal
-	}
-
-	updates := map[string]interface{}{
-		"password":                    hashedPassword,
-		"request_password_token":      nil,
-		"request_password_expiration": nil,
-		"retries":                     0,
-	}
-
-	return s.repo.UpdateAuth(ctx, user.Auth.ID, updates)
-}
-
-func generateRandom6DigitToken() (string, error) {
-	n, err := rand.Int(randReader, big.NewInt(900000))
-	if err != nil {
-		return "", err
-	}
-	return fmt.Sprintf("%06d", n.Int64()+100000), nil
 }
 
 func (s *authService) prepareAuthResponse(ctx context.Context, user *models.User) (*LoginResponse, error) {
