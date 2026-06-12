@@ -7,14 +7,17 @@ import (
 )
 
 func RegisterRoutes(publicRG *gin.RouterGroup, protectedRG *gin.RouterGroup, db *gorm.DB) {
+	sm := session.NewSessionManager()
 	repo := NewRepository(db)
-	svc := NewService(repo, session.NewSessionManager())
+	svc := NewService(repo, sm)
 	h := NewHandler(svc)
 
 	authGroup := publicRG.Group("/auth")
 	{
 		authGroup.POST("/login", h.Login)
 		authGroup.POST("/refresh", h.Refresh)
+		authGroup.GET("/.well-known/jwks.json", h.JWKS)
 	}
+	protectedRG.POST("/auth/logout", h.Logout)
 	protectedRG.GET("/auth/me", h.Me)
 }

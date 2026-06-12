@@ -76,6 +76,26 @@ func (h *Handler) Refresh(c *gin.Context) {
 	c.JSON(http.StatusOK, res)
 }
 
+func (h *Handler) Logout(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "usuário não identificado"})
+		return
+	}
+
+	err := h.service.Logout(c.Request.Context(), userID.(string))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "erro ao revogar sessão"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": true})
+}
+
+func (h *Handler) JWKS(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{"keys": []interface{}{}})
+}
+
 func (h *Handler) handleError(c *gin.Context, err error) {
 	status := http.StatusInternalServerError
 	message := "erro interno do servidor"

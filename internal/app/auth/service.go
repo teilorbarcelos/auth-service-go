@@ -17,6 +17,7 @@ type Service interface {
 	Login(ctx context.Context, email, password string) (*LoginResponse, error)
 	GetMe(ctx context.Context, email string) (*LoginResponse, error)
 	RefreshToken(ctx context.Context, refreshToken string) (*LoginResponse, error)
+	Logout(ctx context.Context, userID string) error
 }
 
 type authService struct {
@@ -121,6 +122,10 @@ func (s *authService) RefreshToken(ctx context.Context, refreshToken string) (*L
 	}
 
 	return s.prepareAuthResponse(ctx, user)
+}
+
+func (s *authService) Logout(ctx context.Context, userID string) error {
+	return s.sessionManager.InvalidateUserSessions(userID, "")
 }
 
 func (s *authService) prepareAuthResponse(ctx context.Context, user *models.User) (*LoginResponse, error) {

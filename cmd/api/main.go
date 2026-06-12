@@ -72,6 +72,26 @@ func main() {
 			"environment": config.AppConfig.Environment,
 		})
 	})
+	r.GET("/liveness", func(c *gin.Context) {
+		c.JSON(200, gin.H{"status": "UP"})
+	})
+	r.GET("/ready", func(c *gin.Context) {
+		dbOK := database.DB != nil
+		cacheOK := cache.RedisClient != nil
+		status := "UP"
+		if !dbOK || !cacheOK {
+			status = "DOWN"
+		}
+		code := 200
+		if status == "DOWN" {
+			code = 503
+		}
+		c.JSON(code, gin.H{
+			"status":   status,
+			"database": dbOK,
+			"cache":    cacheOK,
+		})
+	})
 
 	v1 := r.Group("/v1")
 	{
