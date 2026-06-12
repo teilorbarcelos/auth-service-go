@@ -1,0 +1,1333 @@
+basePath: /v1
+definitions:
+  backend-go_internal_core_models.Feature:
+    properties:
+      active:
+        type: boolean
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      is_deleted:
+        type: boolean
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  backend-go_internal_core_models.Product:
+    properties:
+      active:
+        type: boolean
+      category:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      id_user:
+        type: string
+      is_deleted:
+        type: boolean
+      name:
+        type: string
+      price:
+        type: number
+      sku:
+        type: string
+      stock:
+        type: integer
+      updated_at:
+        type: string
+      user:
+        $ref: '#/definitions/backend-go_internal_core_models.User'
+    type: object
+  backend-go_internal_core_models.Role:
+    properties:
+      RoleFeature:
+        items:
+          $ref: '#/definitions/backend-go_internal_core_models.RoleFeature'
+        type: array
+      active:
+        type: boolean
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      description:
+        type: string
+      id:
+        type: string
+      is_deleted:
+        type: boolean
+      name:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  backend-go_internal_core_models.RoleFeature:
+    properties:
+      activate:
+        type: boolean
+      create:
+        type: boolean
+      delete:
+        type: boolean
+      id_feature:
+        type: string
+      id_role:
+        type: string
+      view:
+        type: boolean
+    type: object
+  backend-go_internal_core_models.User:
+    properties:
+      Role:
+        $ref: '#/definitions/backend-go_internal_core_models.Role'
+      active:
+        type: boolean
+      avatar:
+        type: string
+      cognito_id:
+        type: string
+      created_at:
+        type: string
+      deleted_at:
+        type: string
+      document:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      id_auth:
+        type: string
+      id_role:
+        type: string
+      is_deleted:
+        type: boolean
+      name:
+        type: string
+      phone:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  internal_app_auth.ForgotPasswordRequest:
+    properties:
+      email:
+        type: string
+    required:
+    - email
+    type: object
+  internal_app_auth.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  internal_app_auth.LoginResponse:
+    properties:
+      message:
+        type: string
+      refreshToken:
+        type: string
+      token:
+        type: string
+      user:
+        $ref: '#/definitions/internal_app_auth.UserResponse'
+      valid:
+        type: boolean
+    type: object
+  internal_app_auth.RefreshRequest:
+    properties:
+      refreshToken:
+        type: string
+    required:
+    - refreshToken
+    type: object
+  internal_app_auth.ResetPasswordRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      token:
+        type: string
+    required:
+    - email
+    - password
+    - token
+    type: object
+  internal_app_auth.UserResponse:
+    properties:
+      active:
+        type: boolean
+      avatar:
+        type: string
+      created_at:
+        type: string
+      document:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      id_role:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      role: {}
+      updated_at:
+        type: string
+    type: object
+  internal_app_auth.ValidateTokenRequest:
+    properties:
+      email:
+        type: string
+      token:
+        type: string
+    required:
+    - email
+    - token
+    type: object
+  internal_app_product.CreateProductDTO:
+    properties:
+      category:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      sku:
+        type: string
+      stock:
+        type: integer
+    required:
+    - category
+    - name
+    - price
+    - sku
+    type: object
+  internal_app_product.ProductListAllResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/backend-go_internal_core_models.Product'
+        type: array
+      total:
+        type: integer
+    type: object
+  internal_app_product.ProductListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/backend-go_internal_core_models.Product'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  internal_app_product.UpdateStatusRequest:
+    properties:
+      active:
+        type: boolean
+    type: object
+  internal_app_role.CreateRoleDTO:
+    properties:
+      description:
+        type: string
+      name:
+        type: string
+      permissions:
+        items:
+          $ref: '#/definitions/backend-go_internal_core_models.RoleFeature'
+        type: array
+    required:
+    - description
+    - name
+    type: object
+  internal_app_role.RoleListAllResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/backend-go_internal_core_models.Role'
+        type: array
+      total:
+        type: integer
+    type: object
+  internal_app_role.RoleListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/backend-go_internal_core_models.Role'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+  internal_app_role.UpdateStatusRequest:
+    properties:
+      active:
+        type: boolean
+    type: object
+  internal_app_user.CreateUserDTO:
+    properties:
+      active:
+        type: boolean
+      email:
+        type: string
+      id_role:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - id_role
+    - name
+    - password
+    type: object
+  internal_app_user.UpdateStatusRequest:
+    properties:
+      active:
+        type: boolean
+    type: object
+  internal_app_user.UpdateUserDTO:
+    properties:
+      active:
+        type: boolean
+      email:
+        type: string
+      id_role:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  internal_app_user.UserListAllResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/backend-go_internal_core_models.User'
+        type: array
+      total:
+        type: integer
+    type: object
+  internal_app_user.UserListResponse:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/backend-go_internal_core_models.User'
+        type: array
+      limit:
+        type: integer
+      page:
+        type: integer
+      total:
+        type: integer
+    type: object
+host: localhost:8888
+info:
+  contact:
+    email: suporte@swagger.io
+    name: Suporte API
+    url: http://www.swagger.io/support
+  description: API modular em Go com Gin e Swagger.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Backend Go API
+  version: "1.0"
+paths:
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Autentica o usuário com email e senha, retornando tokens JWT e
+        dados do usuário.
+      parameters:
+      - description: Credenciais de acesso
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_app_auth.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_app_auth.LoginResponse'
+        "400":
+          description: Dados inválidos
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Credenciais inválidas
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Realizar Login
+      tags:
+      - Auth
+  /auth/me:
+    get:
+      description: Retorna informações do usuário logado baseado no token JWT.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_app_auth.LoginResponse'
+        "401":
+          description: Não autorizado
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obter dados do usuário atual
+      tags:
+      - Auth
+  /auth/password/change:
+    post:
+      consumes:
+      - application/json
+      description: Altera a senha do usuário utilizando o código de validação.
+      parameters:
+      - description: Novos dados de senha
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_app_auth.ResetPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: senha alterada com sucesso'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Token inválido ou expirado
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Redefinir senha
+      tags:
+      - Auth
+  /auth/password/request:
+    post:
+      consumes:
+      - application/json
+      description: Envia um e-mail com um código de 6 dígitos para o usuário.
+      parameters:
+      - description: Email do usuário
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_app_auth.ForgotPasswordRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: e-mail de recuperação enviado se o usuário existir'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Solicitar recuperação de senha
+      tags:
+      - Auth
+  /auth/password/validate:
+    post:
+      consumes:
+      - application/json
+      description: Verifica se o código de 6 dígitos é válido e não expirou.
+      parameters:
+      - description: Dados de validação
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_app_auth.ValidateTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'valid: true'
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+        "401":
+          description: Token inválido ou expirado
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Validar código de recuperação
+      tags:
+      - Auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Gera um novo access token a partir de um refresh token válido.
+      parameters:
+      - description: Refresh token
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_app_auth.RefreshRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_app_auth.LoginResponse'
+        "400":
+          description: Dados inválidos
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Refresh token inválido ou expirado
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Renovar token
+      tags:
+      - Auth
+  /product:
+    get:
+      description: Retorna produtos com paginação e filtros.
+      parameters:
+      - description: 'Número da página (padrão: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Itens por página (padrão: 25)'
+        in: query
+        name: size
+        type: integer
+      - description: Termo de busca
+        in: query
+        name: searchWord
+        type: string
+      - description: 'Campos para busca (ex: name,sku,category)'
+        in: query
+        name: searchFields
+        type: string
+      - description: Campo para ordenação
+        in: query
+        name: orderBy
+        type: string
+      - description: Direção da ordenação (asc/desc)
+        in: query
+        name: orderDirection
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_app_product.ProductListResponse'
+      security:
+      - Bearer: []
+      summary: Listar Produtos
+      tags:
+      - Product
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo produto com os dados fornecidos.
+      parameters:
+      - description: Dados do produto
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_app_product.CreateProductDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/backend-go_internal_core_models.Product'
+        "400":
+          description: Dados inválidos
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Criar Produto
+      tags:
+      - Product
+  /product/{id}:
+    delete:
+      description: Remove um produto logicamente ou fisicamente baseado no ID.
+      parameters:
+      - description: ID do Produto
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: produto excluído com sucesso'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Excluir Produto
+      tags:
+      - Product
+    get:
+      description: Retorna os detalhes de um produto específico.
+      parameters:
+      - description: ID do Produto
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/backend-go_internal_core_models.Product'
+        "404":
+          description: Produto não encontrado
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obter Produto
+      tags:
+      - Product
+    put:
+      consumes:
+      - application/json
+      description: Atualiza parcialmente um produto baseado no ID.
+      parameters:
+      - description: ID do Produto
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Campos a serem atualizados
+        in: body
+        name: request
+        required: true
+        schema:
+          additionalProperties: true
+          type: object
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/backend-go_internal_core_models.Product'
+        "400":
+          description: Dados inválidos
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Atualizar Produto
+      tags:
+      - Product
+  /product/{id}/status:
+    patch:
+      consumes:
+      - application/json
+      description: Define se um produto está ativo ou inativo.
+      parameters:
+      - description: ID do Produto
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Novo status
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_app_product.UpdateStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: status atualizado com sucesso'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Alterar Status do Produto
+      tags:
+      - Product
+  /product/all:
+    get:
+      description: Retorna todos os produtos (usado para selects/lookups).
+      parameters:
+      - description: Termo de busca
+        in: query
+        name: searchWord
+        type: string
+      - description: Campos para busca
+        in: query
+        name: searchFields
+        type: string
+      - description: Campo para ordenação
+        in: query
+        name: orderBy
+        type: string
+      - description: Direção da ordenação
+        in: query
+        name: orderDirection
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_app_product.ProductListAllResponse'
+      security:
+      - Bearer: []
+      summary: Listar Todos os Produtos
+      tags:
+      - Product
+  /role:
+    get:
+      description: Retorna papéis com paginação e filtros.
+      parameters:
+      - description: 'Número da página (padrão: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Itens por página (padrão: 25)'
+        in: query
+        name: size
+        type: integer
+      - description: Termo de busca
+        in: query
+        name: searchWord
+        type: string
+      - description: 'Campos para busca (ex: name)'
+        in: query
+        name: searchFields
+        type: string
+      - description: Campo para ordenação
+        in: query
+        name: orderBy
+        type: string
+      - description: Direção da ordenação (asc/desc)
+        in: query
+        name: orderDirection
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_app_role.RoleListResponse'
+      security:
+      - Bearer: []
+      summary: Listar Papéis (Roles)
+      tags:
+      - Role
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo papel com permissões específicas.
+      parameters:
+      - description: Dados do papel
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_app_role.CreateRoleDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/backend-go_internal_core_models.Role'
+        "400":
+          description: Dados inválidos
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Criar Papel (Role)
+      tags:
+      - Role
+  /role/{id}:
+    delete:
+      description: Remove um papel baseado no ID.
+      parameters:
+      - description: ID do Papel
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: papel excluído com sucesso'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Excluir Papel (Role)
+      tags:
+      - Role
+    get:
+      description: Retorna os detalhes de um papel e suas permissões.
+      parameters:
+      - description: ID do Papel
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/backend-go_internal_core_models.Role'
+        "404":
+          description: Papel não encontrado
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obter Papel (Role)
+      tags:
+      - Role
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados e permissões de um papel baseado no ID.
+      parameters:
+      - description: ID do Papel
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Dados do papel
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_app_role.CreateRoleDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/backend-go_internal_core_models.Role'
+        "400":
+          description: Dados inválidos
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Atualizar Papel (Role)
+      tags:
+      - Role
+  /role/{id}/status:
+    patch:
+      consumes:
+      - application/json
+      description: Define se um papel está ativo ou inativo.
+      parameters:
+      - description: ID do Papel
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Novo status
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_app_role.UpdateStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: status atualizado com sucesso'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Alterar Status do Papel (Role)
+      tags:
+      - Role
+  /role/all:
+    get:
+      description: Retorna todos os papéis (usado para selects/lookups).
+      parameters:
+      - description: Termo de busca
+        in: query
+        name: searchWord
+        type: string
+      - description: Campos para busca
+        in: query
+        name: searchFields
+        type: string
+      - description: Campo para ordenação
+        in: query
+        name: orderBy
+        type: string
+      - description: Direção da ordenação
+        in: query
+        name: orderDirection
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_app_role.RoleListAllResponse'
+      security:
+      - Bearer: []
+      summary: Listar Todos os Papéis (Roles)
+      tags:
+      - Role
+  /role/features:
+    get:
+      description: Retorna a lista de todas as funcionalidades disponíveis para atribuição
+        de permissões.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/backend-go_internal_core_models.Feature'
+            type: array
+        "500":
+          description: Erro interno
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Listar Funcionalidades
+      tags:
+      - Role
+  /user:
+    get:
+      description: Retorna usuários com paginação e filtros.
+      parameters:
+      - description: 'Número da página (padrão: 1)'
+        in: query
+        name: page
+        type: integer
+      - description: 'Itens por página (padrão: 25)'
+        in: query
+        name: size
+        type: integer
+      - description: Termo de busca
+        in: query
+        name: searchWord
+        type: string
+      - description: 'Campos para busca (ex: name,email,Role.name)'
+        in: query
+        name: searchFields
+        type: string
+      - description: Campo para ordenação
+        in: query
+        name: orderBy
+        type: string
+      - description: Direção da ordenação (asc/desc)
+        in: query
+        name: orderDirection
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_app_user.UserListResponse'
+      security:
+      - Bearer: []
+      summary: Listar Usuários
+      tags:
+      - User
+    post:
+      consumes:
+      - application/json
+      description: Cria um novo usuário com os dados fornecidos.
+      parameters:
+      - description: Dados do usuário
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_app_user.CreateUserDTO'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/backend-go_internal_core_models.User'
+        "400":
+          description: Dados inválidos
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Criar Usuário
+      tags:
+      - User
+  /user/{id}:
+    delete:
+      description: Remove um usuário logicamente baseado no ID.
+      parameters:
+      - description: ID do Usuário
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: usuário excluído com sucesso'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Excluir Usuário
+      tags:
+      - User
+    get:
+      description: Retorna os detalhes de um usuário específico.
+      parameters:
+      - description: ID do Usuário
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/backend-go_internal_core_models.User'
+        "404":
+          description: Usuário não encontrado
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Obter Usuário
+      tags:
+      - User
+    put:
+      consumes:
+      - application/json
+      description: Atualiza os dados de um usuário baseado no ID.
+      parameters:
+      - description: ID do Usuário
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Campos a serem atualizados
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_app_user.UpdateUserDTO'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/backend-go_internal_core_models.User'
+        "400":
+          description: Dados inválidos
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Atualizar Usuário
+      tags:
+      - User
+  /user/{id}/status:
+    patch:
+      consumes:
+      - application/json
+      description: Define se um usuário está ativo ou inativo.
+      parameters:
+      - description: ID do Usuário
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Novo status
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/internal_app_user.UpdateStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 'message: status atualizado com sucesso'
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Alterar Status do Usuário
+      tags:
+      - User
+  /user/all:
+    get:
+      description: Retorna todos os usuários (usado para selects/lookups).
+      parameters:
+      - description: Termo de busca
+        in: query
+        name: searchWord
+        type: string
+      - description: Campos para busca
+        in: query
+        name: searchFields
+        type: string
+      - description: Campo para ordenação
+        in: query
+        name: orderBy
+        type: string
+      - description: Direção da ordenação
+        in: query
+        name: orderDirection
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal_app_user.UserListAllResponse'
+      security:
+      - Bearer: []
+      summary: Listar Todos os Usuários
+      tags:
+      - User
+  /user/export/pdf:
+    get:
+      description: Exporta a lista filtrada de usuários para um arquivo PDF.
+      parameters:
+      - description: Termo de busca
+        in: query
+        name: searchWord
+        type: string
+      - description: Campos para busca
+        in: query
+        name: searchFields
+        type: string
+      - description: Campo para ordenação
+        in: query
+        name: orderBy
+        type: string
+      - description: Direção da ordenação
+        in: query
+        name: orderDirection
+        type: string
+      produces:
+      - application/pdf
+      responses:
+        "200":
+          description: PDF file
+          schema:
+            type: file
+        "400":
+          description: Dados inválidos
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Erro interno
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - Bearer: []
+      summary: Exportar Usuários para PDF
+      tags:
+      - User
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

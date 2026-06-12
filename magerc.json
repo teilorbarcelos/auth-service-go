@@ -1,0 +1,82 @@
+{
+  "scripts": [
+    {
+      "name": "🛠️ Install Dependencies",
+      "command": "go mod tidy"
+    },
+    {
+      "name": "🚀 Start Development Server (Air)",
+      "command": "make dev"
+    },
+    {
+      "name": "🐳 Infrastructure: Start All (Postgres, Redis, RabbitMQ)",
+      "command": "make infra-up"
+    },
+    {
+      "name": "🐳 Infrastructure: Stop Services",
+      "command": "make infra-stop"
+    },
+    {
+      "name": "🐳 Infrastructure: Down (Remove Containers)",
+      "command": "make infra-down"
+    },
+    {
+      "name": "🐳 Infrastructure: Clean (Prune Volumes & Images)",
+      "command": "make infra-clean"
+    },
+    {
+      "name": "📊 Metrics: Start (Prometheus & Grafana)",
+      "command": "make metrics-up"
+    },
+    {
+      "name": "📊 Metrics: Stop",
+      "command": "make metrics-stop"
+    },
+    {
+      "name": "📊 Metrics: Down (Remove Containers)",
+      "command": "make metrics-down"
+    },
+    {
+      "name": "🧪 Run All Tests",
+      "command": "make test"
+    },
+    {
+      "name": "📊 Code Coverage (Terminal Summary)",
+      "command": "make coverage"
+    },
+    {
+      "name": "📊 Code Coverage (HTML Report)",
+      "command": "make coverage-html"
+    },
+    {
+      "name": "📝 Update Swagger Documentation",
+      "command": "make swagger"
+    },
+    {
+      "name": "🗄️ Database: Run Migrations",
+      "command": "make migrate-up"
+    },
+    {
+      "name": "📦 Storage Driver: Install S3",
+      "command": "make storage-driver name=s3"
+    },
+    {
+      "name": "📦 Storage Driver: Install GCS",
+      "command": "make storage-driver name=gcs"
+    },
+    {
+      "name": "📦 Storage Driver: Install Azure",
+      "command": "make storage-driver name=azure"
+    },
+    {
+      "name": "📦 Storage Driver: Install Local",
+      "command": "make storage-driver name=local"
+    }
+  ],
+  "replacements": [
+    {
+      "path": "go.mod",
+      "pattern": "github.com/teilorbarcelos/backend-go"
+    }
+  ]
+}

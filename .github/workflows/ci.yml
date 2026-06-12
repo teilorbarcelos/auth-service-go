@@ -1,0 +1,50 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    services:
+      # Embora o Testcontainers suba os containers dinamicamente, 
+      # o runner do GitHub precisa do Docker ativo.
+      docker:
+        image: docker:dind
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.21'
+        cache: true
+
+    - name: Install dependencies
+      run: go mod tidy
+
+    - name: Verify dependencies
+      run: git diff --exit-code go.mod go.sum
+
+    - name: Build
+      run: go build -v ./cmd/api
+
+    - name: Run Tests
+      run: make test
+      env:
+        ENVIRONMENT: test
+
+    - name: Check Coverage
+      run: |
+        make coverage
+        COVERAGE=$(go tool cover -func=coverage.out | grep total | grep -Eo '[0-9]+\.[0-9]+')
+        echo "Total coverage: $COVERAGE%"
+        if (( $(echo "$COVERAGE < 100" | bc -l) )); then
+          echo "Coverage is below 100%: $COVERAGE%"
+          exit 1
+        fi
