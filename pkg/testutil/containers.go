@@ -46,6 +46,12 @@ var (
 			&models.User{},
 		)
 	}
+	postgresRunContainer = func(ctx context.Context, img string, opts ...testcontainers.ContainerCustomizer) (*postgres.PostgresContainer, error) {
+		return postgres.Run(ctx, img, opts...)
+	}
+	redisRunContainer = func(ctx context.Context, img string, opts ...testcontainers.ContainerCustomizer) (*redis.RedisContainer, error) {
+		return redis.Run(ctx, img, opts...)
+	}
 )
 
 func SetupPostgresContainer(ctx context.Context) (*PostgresContainer, error) {
@@ -54,7 +60,7 @@ func SetupPostgresContainer(ctx context.Context) (*PostgresContainer, error) {
 	dbUser := "postgres"
 	dbPassword := "postgres"
 
-	pgContainer, err := postgres.Run(ctx,
+	pgContainer, err := postgresRunContainer(ctx,
 		"postgres:16-alpine",
 		postgres.WithDatabase(dbName),
 		postgres.WithUsername(dbUser),
@@ -96,7 +102,7 @@ func SetupPostgresContainer(ctx context.Context) (*PostgresContainer, error) {
 }
 
 func SetupRedisContainer(ctx context.Context) (*RedisContainer, error) {
-	redisContainer, err := redis.Run(ctx,
+	redisContainer, err := redisRunContainer(ctx,
 		"redis:7-alpine",
 		testcontainers.WithWaitStrategy(
 			wait.ForLog("Ready to accept connections"),

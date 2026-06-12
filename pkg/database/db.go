@@ -57,7 +57,7 @@ func ConnectDB() {
 			SingularTable: true,
 		},
 		PrepareStmt: true,
-		NowFunc:     func() time.Time { return time.Now().UTC() },
+		NowFunc:     time.Now,
 	}
 
 	if config.AppConfig.Environment == "production" {
