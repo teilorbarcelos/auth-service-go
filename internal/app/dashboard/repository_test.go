@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"backend-go/pkg/database"
+	"github.com/teilorbarcelos/auth-service-go/pkg/database"
 	"github.com/stretchr/testify/assert"
 )
 

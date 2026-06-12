@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"backend-go/pkg/database"
-	"backend-go/pkg/testutil"
+	"github.com/teilorbarcelos/auth-service-go/pkg/database"
+	"github.com/teilorbarcelos/auth-service-go/pkg/testutil"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"

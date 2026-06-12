@@ -3,10 +3,10 @@ package user
 import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"backend-go/internal/infra/pdf"
-	"backend-go/internal/infra/session"
-	"backend-go/internal/middleware"
-	"backend-go/pkg/config"
+	"github.com/teilorbarcelos/auth-service-go/internal/infra/pdf"
+	"github.com/teilorbarcelos/auth-service-go/internal/infra/session"
+	"github.com/teilorbarcelos/auth-service-go/internal/middleware"
+	"github.com/teilorbarcelos/auth-service-go/pkg/config"
 )
 
 func RegisterRoutes(rg *gin.RouterGroup, db *gorm.DB, sm session.SessionStore) {

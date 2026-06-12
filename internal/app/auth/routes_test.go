@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"backend-go/pkg/database"
+	"github.com/teilorbarcelos/auth-service-go/pkg/database"
 )
 
 func TestRegisterRoutes(t *testing.T) {

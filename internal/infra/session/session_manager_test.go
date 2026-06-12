@@ -8,8 +8,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/redis/go-redis/v9"
-	"backend-go/pkg/cache"
-	"backend-go/pkg/config"
+	"github.com/teilorbarcelos/auth-service-go/pkg/cache"
+	"github.com/teilorbarcelos/auth-service-go/pkg/config"
 )
 
 func TestMain(m *testing.M) {

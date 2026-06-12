@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"backend-go/pkg/database"
+	"github.com/teilorbarcelos/auth-service-go/pkg/database"
 )
 
 func TestDashboardHandler_GetStats(t *testing.T) {

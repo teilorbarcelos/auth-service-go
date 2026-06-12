@@ -8,10 +8,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/redis/go-redis/v9"
-	"backend-go/internal/core/models"
-	"backend-go/internal/infra/session"
-	"backend-go/pkg/cache"
-	"backend-go/pkg/database"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
+	"github.com/teilorbarcelos/auth-service-go/internal/infra/session"
+	"github.com/teilorbarcelos/auth-service-go/pkg/cache"
+	"github.com/teilorbarcelos/auth-service-go/pkg/database"
 )
 
 type MockRoleRepository struct {

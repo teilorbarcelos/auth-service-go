@@ -7,10 +7,10 @@ import (
 	"os"
 	"testing"
 
-	"backend-go/pkg/cache"
-	"backend-go/pkg/config"
-	"backend-go/pkg/database"
-	"backend-go/pkg/testutil"
+	"github.com/teilorbarcelos/auth-service-go/pkg/cache"
+	"github.com/teilorbarcelos/auth-service-go/pkg/config"
+	"github.com/teilorbarcelos/auth-service-go/pkg/database"
+	"github.com/teilorbarcelos/auth-service-go/pkg/testutil"
 	"github.com/redis/go-redis/v9"
 )
 

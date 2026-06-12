@@ -1,9 +1,9 @@
 package role
 
 import (
-	"backend-go/internal/core/models"
-	"backend-go/internal/core/repository"
-	"backend-go/pkg/database"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/repository"
+	"github.com/teilorbarcelos/auth-service-go/pkg/database"
 	"context"
 
 	"gorm.io/gorm"

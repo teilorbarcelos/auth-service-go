@@ -6,11 +6,11 @@ import (
 	"strconv"
 	"time"
 
-	"backend-go/pkg/logger"
-	"backend-go/pkg/retry"
+	"github.com/teilorbarcelos/auth-service-go/pkg/logger"
+	"github.com/teilorbarcelos/auth-service-go/pkg/retry"
 
-	"backend-go/internal/core/models"
-	"backend-go/pkg/config"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
+	"github.com/teilorbarcelos/auth-service-go/pkg/config"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"

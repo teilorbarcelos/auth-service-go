@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"backend-go/internal/core/domainerr"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/domainerr"
 )
 
 type MockAuthService struct {

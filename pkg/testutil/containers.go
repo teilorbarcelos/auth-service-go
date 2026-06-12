@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"backend-go/internal/core/models"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
 
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"

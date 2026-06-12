@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"gorm.io/gorm"
-	"backend-go/pkg/config"
+	"github.com/teilorbarcelos/auth-service-go/pkg/config"
 )
 
 func TestParseFilterParams(t *testing.T) {

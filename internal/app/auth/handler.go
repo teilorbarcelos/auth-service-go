@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"backend-go/internal/core/domainerr"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/domainerr"
 
 	"github.com/gin-gonic/gin"
 )

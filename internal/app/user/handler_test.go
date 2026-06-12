@@ -13,9 +13,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"backend-go/internal/core/models"
-	"backend-go/internal/infra/session"
-	"backend-go/pkg/database"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
+	"github.com/teilorbarcelos/auth-service-go/internal/infra/session"
+	"github.com/teilorbarcelos/auth-service-go/pkg/database"
 )
 
 type MockUserService struct {

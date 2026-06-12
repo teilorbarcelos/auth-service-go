@@ -6,13 +6,13 @@ import (
 	"io"
 	"time"
 
-	"backend-go/internal/core/models"
-	"backend-go/internal/infra/pdf"
-	"backend-go/internal/infra/session"
-	"backend-go/pkg/config"
-	"backend-go/pkg/database"
-	"backend-go/pkg/logger"
-	"backend-go/pkg/security"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
+	"github.com/teilorbarcelos/auth-service-go/internal/infra/pdf"
+	"github.com/teilorbarcelos/auth-service-go/internal/infra/session"
+	"github.com/teilorbarcelos/auth-service-go/pkg/config"
+	"github.com/teilorbarcelos/auth-service-go/pkg/database"
+	"github.com/teilorbarcelos/auth-service-go/pkg/logger"
+	"github.com/teilorbarcelos/auth-service-go/pkg/security"
 	"go.uber.org/zap"
 )
 

@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"backend-go/internal/core/models"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
 	"gorm.io/gorm"
 )
 

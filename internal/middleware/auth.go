@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strings"
 
-	"backend-go/pkg/cache"
-		"backend-go/pkg/security"
+	"github.com/teilorbarcelos/auth-service-go/pkg/cache"
+		"github.com/teilorbarcelos/auth-service-go/pkg/security"
 
 	"github.com/gin-gonic/gin"
 )

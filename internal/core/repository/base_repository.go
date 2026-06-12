@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"backend-go/pkg/database"
+	"github.com/teilorbarcelos/auth-service-go/pkg/database"
 
 	"gorm.io/gorm"
 )

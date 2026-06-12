@@ -80,9 +80,9 @@ func automateRegistration(data TemplateData) {
 	if err == nil {
 		content := string(mainContent)
 		// Adicionar Import
-		if !strings.Contains(content, "backend-go/internal/app/media") {
-			newImport := "\"backend-go/internal/app/product\"\n\t\"backend-go/internal/app/media\""
-			content = strings.Replace(content, "\"backend-go/internal/app/product\"", newImport, 1)
+		if !strings.Contains(content, "github.com/teilorbarcelos/auth-service-go/internal/app/media") {
+			newImport := "\"github.com/teilorbarcelos/auth-service-go/internal/app/product\"\n\t\"github.com/teilorbarcelos/auth-service-go/internal/app/media\""
+			content = strings.Replace(content, "\"github.com/teilorbarcelos/auth-service-go/internal/app/product\"", newImport, 1)
 		}
 		// Adicionar Rota
 		if !strings.Contains(content, "media.RegisterRoutes") {

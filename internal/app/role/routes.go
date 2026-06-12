@@ -3,8 +3,8 @@ package role
 import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"backend-go/internal/infra/session"
-	"backend-go/internal/middleware"
+	"github.com/teilorbarcelos/auth-service-go/internal/infra/session"
+	"github.com/teilorbarcelos/auth-service-go/internal/middleware"
 )
 
 func RegisterRoutes(rg *gin.RouterGroup, db *gorm.DB, sm session.SessionStore) {

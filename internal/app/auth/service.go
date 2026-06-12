@@ -6,12 +6,12 @@ import (
 	"log"
 	"time"
 
-	"backend-go/internal/core/domainerr"
-	"backend-go/internal/core/models"
-	"backend-go/internal/infra/session"
-	"backend-go/pkg/cache"
-	"backend-go/pkg/email"
-	"backend-go/pkg/security"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/domainerr"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
+	"github.com/teilorbarcelos/auth-service-go/internal/infra/session"
+	"github.com/teilorbarcelos/auth-service-go/pkg/cache"
+	"github.com/teilorbarcelos/auth-service-go/pkg/email"
+	"github.com/teilorbarcelos/auth-service-go/pkg/security"
 	"crypto/rand"
 	"math/big"
 )

@@ -3,7 +3,7 @@ package product
 import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"backend-go/internal/middleware"
+	"github.com/teilorbarcelos/auth-service-go/internal/middleware"
 )
 
 func RegisterRoutes(rg *gin.RouterGroup, db *gorm.DB) {

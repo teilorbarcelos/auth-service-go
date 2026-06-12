@@ -6,7 +6,7 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/stretchr/testify/assert"
-	"backend-go/pkg/config"
+	"github.com/teilorbarcelos/auth-service-go/pkg/config"
 )
 
 func TestJWT(t *testing.T) {

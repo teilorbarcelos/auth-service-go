@@ -4,8 +4,8 @@ import (
 	"sync"
 	"time"
 
-	"backend-go/internal/core/models"
-	"backend-go/pkg/logger"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
+	"github.com/teilorbarcelos/auth-service-go/pkg/logger"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )

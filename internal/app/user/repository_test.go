@@ -9,10 +9,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	"backend-go/internal/core/models"
-	"backend-go/internal/core/repository"
-	"backend-go/pkg/config"
-	"backend-go/pkg/database"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/repository"
+	"github.com/teilorbarcelos/auth-service-go/pkg/config"
+	"github.com/teilorbarcelos/auth-service-go/pkg/database"
 )
 
 func TestUserRepository_SearchPaginated(t *testing.T) {

@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"strings"
 
-	"backend-go/internal/core/models"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"

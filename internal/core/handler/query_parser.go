@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"backend-go/pkg/config"
-	"backend-go/pkg/database"
+	"github.com/teilorbarcelos/auth-service-go/pkg/config"
+	"github.com/teilorbarcelos/auth-service-go/pkg/database"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"

@@ -1,4 +1,4 @@
-module backend-go
+module github.com/teilorbarcelos/auth-service-go
 
 go 1.25.0
 

@@ -7,9 +7,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"backend-go/internal/infra/session"
-	"backend-go/pkg/config"
-	"backend-go/pkg/database"
+	"github.com/teilorbarcelos/auth-service-go/internal/infra/session"
+	"github.com/teilorbarcelos/auth-service-go/pkg/config"
+	"github.com/teilorbarcelos/auth-service-go/pkg/database"
 )
 
 func TestRegisterRoutes(t *testing.T) {

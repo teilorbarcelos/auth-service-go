@@ -1,10 +1,10 @@
 package role
 
 import (
-	"backend-go/internal/core/models"
-	"backend-go/internal/infra/session"
-	"backend-go/pkg/database"
-	"backend-go/pkg/logger"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
+	"github.com/teilorbarcelos/auth-service-go/internal/infra/session"
+	"github.com/teilorbarcelos/auth-service-go/pkg/database"
+	"github.com/teilorbarcelos/auth-service-go/pkg/logger"
 	"context"
 	"go.uber.org/zap"
 )

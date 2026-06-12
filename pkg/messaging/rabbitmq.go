@@ -7,7 +7,7 @@ import (
 	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
-	"backend-go/pkg/config"
+	"github.com/teilorbarcelos/auth-service-go/pkg/config"
 )
 
 type AMQPChannel interface {

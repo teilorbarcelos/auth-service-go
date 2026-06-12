@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"backend-go/pkg/security"
+	"github.com/teilorbarcelos/auth-service-go/pkg/security"
 
 	"github.com/gin-gonic/gin"
 )

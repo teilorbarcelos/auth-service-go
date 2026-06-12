@@ -38,6 +38,5 @@ go.work.sum
 *.log
 
 # Air hot reload
-TODO.md
 .scannerwork/
 tmp

@@ -9,12 +9,12 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"backend-go/internal/core/models"
-	"backend-go/internal/infra/pdf"
-	"backend-go/internal/infra/session"
-	"backend-go/pkg/config"
-	"backend-go/pkg/database"
-	"backend-go/pkg/security"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
+	"github.com/teilorbarcelos/auth-service-go/internal/infra/pdf"
+	"github.com/teilorbarcelos/auth-service-go/internal/infra/session"
+	"github.com/teilorbarcelos/auth-service-go/pkg/config"
+	"github.com/teilorbarcelos/auth-service-go/pkg/database"
+	"github.com/teilorbarcelos/auth-service-go/pkg/security"
 )
 
 type failReader struct{}

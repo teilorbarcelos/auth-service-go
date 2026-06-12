@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"backend-go/internal/infra/session"
+	"github.com/teilorbarcelos/auth-service-go/internal/infra/session"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )

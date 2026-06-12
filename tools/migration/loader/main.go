@@ -5,7 +5,7 @@ import (
 	"io"
 	"os"
 
-	"backend-go/internal/core/models"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
 
 	"ariga.io/atlas-provider-gorm/gormschema"
 )
