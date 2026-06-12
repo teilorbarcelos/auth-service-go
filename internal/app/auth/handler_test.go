@@ -234,3 +234,72 @@ func TestAuthHandler_Refresh(t *testing.T) {
 		assert.Equal(t, http.StatusUnauthorized, w.Code)
 	})
 }
+
+func TestAuthHandler_Logout(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	t.Run("Success", func(t *testing.T) {
+		mockSvc := new(MockAuthService)
+		h := NewHandler(mockSvc)
+		r := gin.Default()
+		r.POST("/logout", func(c *gin.Context) {
+			c.Set("userID", "user-123")
+			h.Logout(c)
+		})
+
+		mockSvc.On("Logout", mock.Anything, "user-123").Return(nil)
+
+		req, _ := http.NewRequest("POST", "/logout", nil)
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusOK, w.Code)
+		mockSvc.AssertExpectations(t)
+	})
+
+	t.Run("No UserID in Context", func(t *testing.T) {
+		mockSvc := new(MockAuthService)
+		h := NewHandler(mockSvc)
+		r := gin.Default()
+		r.POST("/logout", h.Logout)
+
+		req, _ := http.NewRequest("POST", "/logout", nil)
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusUnauthorized, w.Code)
+	})
+
+	t.Run("Service Error", func(t *testing.T) {
+		mockSvc := new(MockAuthService)
+		h := NewHandler(mockSvc)
+		r := gin.Default()
+		r.POST("/logout", func(c *gin.Context) {
+			c.Set("userID", "user-123")
+			h.Logout(c)
+		})
+
+		mockSvc.On("Logout", mock.Anything, "user-123").Return(errors.New("service error"))
+
+		req, _ := http.NewRequest("POST", "/logout", nil)
+		w := httptest.NewRecorder()
+		r.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+	})
+}
+
+func TestAuthHandler_JWKS(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	mockSvc := new(MockAuthService)
+	h := NewHandler(mockSvc)
+	r := gin.Default()
+	r.GET("/.well-known/jwks.json", h.JWKS)
+
+	req, _ := http.NewRequest("GET", "/.well-known/jwks.json", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+}

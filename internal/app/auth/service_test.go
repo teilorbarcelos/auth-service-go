@@ -3,6 +3,7 @@ package auth
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -267,5 +268,24 @@ func TestAuthService_RefreshToken(t *testing.T) {
 		_, err := service.RefreshToken(ctx, token)
 		assert.Error(t, err)
 		assert.Equal(t, domainerr.ErrInvalidCredentials, err)
+	})
+}
+
+func TestAuthService_Logout(t *testing.T) {
+	sm := session.NewSessionManager()
+	service := NewService(new(MockAuthRepository), sm)
+	ctx := context.Background()
+
+	t.Run("Success", func(t *testing.T) {
+		userID := "logout-test-user"
+
+		versionKey := fmt.Sprintf("session:ver:%s", userID)
+		cache.RedisClient.Del(ctx, versionKey)
+
+		err := service.Logout(ctx, userID)
+		assert.NoError(t, err)
+
+		ver, _ := cache.RedisClient.Get(ctx, versionKey).Int()
+		assert.Equal(t, 1, ver)
 	})
 }
