@@ -114,8 +114,6 @@ func ConnectDB() {
 		}
 	}
 
-	RunSeed(DB)
-
 	logger.Info("Conexão com PostgreSQL estabelecida com sucesso.")
 }
 
