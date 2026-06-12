@@ -3,16 +3,16 @@ package auth
 import (
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"testing"
-	"testing/iotest"
 	"time"
 
-	"backend-go/internal/core/domainerr"
-	"backend-go/internal/core/models"
-	"backend-go/internal/infra/session"
-	"backend-go/pkg/cache"
-	"backend-go/pkg/security"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/domainerr"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
+	"github.com/teilorbarcelos/auth-service-go/internal/infra/session"
+	"github.com/teilorbarcelos/auth-service-go/pkg/cache"
+	"github.com/teilorbarcelos/auth-service-go/pkg/security"
 	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -271,203 +271,21 @@ func TestAuthService_RefreshToken(t *testing.T) {
 	})
 }
 
-func TestAuthService_PasswordRecovery(t *testing.T) {
-	mockRepo := new(MockAuthRepository)
+func TestAuthService_Logout(t *testing.T) {
 	sm := session.NewSessionManager()
-	serviceInterface := NewService(mockRepo, sm)
-	service := serviceInterface.(*authService)
+	service := NewService(new(MockAuthRepository), sm)
 	ctx := context.Background()
 
-	emailStr := "test@test.com"
-	user := &models.User{
-		BaseModel: models.BaseModel{ID: "1"},
-		Name:      "Test User",
-		Email:     emailStr,
-		Auth: &models.Auth{
-			BaseModel: models.BaseModel{ID: "auth-1"},
-		},
-	}
+	t.Run("Success", func(t *testing.T) {
+		userID := "logout-test-user"
 
-	t.Run("RequestPasswordReset_Success", func(t *testing.T) {
-		mockRepo.On("FindByEmail", mock.Anything, emailStr).Return(user, nil).Once()
-		mockRepo.On("UpdateAuth", mock.Anything, "auth-1", mock.Anything).Return(nil).Once()
+		versionKey := fmt.Sprintf("session:ver:%s", userID)
+		cache.RedisClient.Del(ctx, versionKey)
 
-		err := service.RequestPasswordReset(ctx, emailStr)
+		err := service.Logout(ctx, userID)
 		assert.NoError(t, err)
-		mockRepo.AssertExpectations(t)
-	})
 
-	t.Run("RequestPasswordReset_UserNotFound", func(t *testing.T) {
-		mockRepo.On("FindByEmail", mock.Anything, "unknown@test.com").Return(nil, os.ErrNotExist).Once()
-
-		err := service.RequestPasswordReset(ctx, "unknown@test.com")
-		assert.NoError(t, err) // Should return nil for security reasons
-	})
-
-	t.Run("ValidateResetToken_Success", func(t *testing.T) {
-		token := "123456"
-		exp := time.Now().Add(time.Hour)
-		userWithToken := *user
-		userWithToken.Auth = &models.Auth{
-			RequestPasswordToken:      &token,
-			RequestPasswordExpiration: &exp,
-		}
-
-		mockRepo.On("FindByEmail", mock.Anything, emailStr).Return(&userWithToken, nil).Once()
-
-		valid, err := service.ValidateResetToken(ctx, emailStr, token)
-		assert.NoError(t, err)
-		assert.True(t, valid)
-	})
-
-	t.Run("ValidateResetToken_InvalidToken", func(t *testing.T) {
-		token := "123456"
-		userWithToken := *user
-		userWithToken.Auth = &models.Auth{
-			RequestPasswordToken: &token,
-		}
-
-		mockRepo.On("FindByEmail", mock.Anything, emailStr).Return(&userWithToken, nil).Once()
-
-		valid, err := service.ValidateResetToken(ctx, emailStr, "wrong")
-		assert.Error(t, err)
-		assert.False(t, valid)
-		assert.Equal(t, domainerr.ErrInvalidToken, err)
-	})
-
-	t.Run("ValidateResetToken_Expired", func(t *testing.T) {
-		token := "123456"
-		exp := time.Now().Add(-time.Hour)
-		userWithToken := *user
-		userWithToken.Auth = &models.Auth{
-			RequestPasswordToken:      &token,
-			RequestPasswordExpiration: &exp,
-		}
-
-		mockRepo.On("FindByEmail", mock.Anything, emailStr).Return(&userWithToken, nil).Once()
-
-		valid, err := service.ValidateResetToken(ctx, emailStr, token)
-		assert.Error(t, err)
-		assert.False(t, valid)
-		assert.Equal(t, domainerr.ErrTokenExpired, err)
-	})
-
-	t.Run("ResetPassword_Success", func(t *testing.T) {
-		token := "123456"
-		exp := time.Now().Add(time.Hour)
-		userWithToken := *user
-		userWithToken.Auth = &models.Auth{
-			BaseModel:                 models.BaseModel{ID: "auth-1"},
-			RequestPasswordToken:      &token,
-			RequestPasswordExpiration: &exp,
-		}
-
-		mockRepo.On("FindByEmail", mock.Anything, emailStr).Return(&userWithToken, nil).Twice()
-		mockRepo.On("UpdateAuth", mock.Anything, "auth-1", mock.MatchedBy(func(updates map[string]interface{}) bool {
-			_, hasPassword := updates["password"]
-			return hasPassword
-		})).Return(nil).Once()
-
-		err := service.ResetPassword(ctx, emailStr, token, "newPassword")
-		assert.NoError(t, err)
-		mockRepo.AssertExpectations(t)
-	})
-
-	t.Run("RequestPasswordReset_NoAuth", func(t *testing.T) {
-		userNoAuth := *user
-		userNoAuth.Auth = nil
-		mockRepo.On("FindByEmail", mock.Anything, emailStr).Return(&userNoAuth, nil).Once()
-
-		err := service.RequestPasswordReset(ctx, emailStr)
-		assert.NoError(t, err) // Agora é silencioso
-	})
-
-	t.Run("RequestPasswordReset_UpdateError", func(t *testing.T) {
-		mockRepo.On("FindByEmail", mock.Anything, emailStr).Return(user, nil).Once()
-		mockRepo.On("UpdateAuth", mock.Anything, "auth-1", mock.Anything).Return(errors.New("db error")).Once()
-
-		err := service.RequestPasswordReset(ctx, emailStr)
-		assert.Error(t, err)
-	})
-
-	t.Run("ValidateResetToken_NoAuth", func(t *testing.T) {
-		userNoAuth := *user
-		userNoAuth.Auth = nil
-		mockRepo.On("FindByEmail", mock.Anything, emailStr).Return(&userNoAuth, nil).Once()
-
-		_, err := service.ValidateResetToken(ctx, emailStr, "123")
-		assert.Error(t, err)
-	})
-
-	t.Run("ResetPassword_UserNotFound", func(t *testing.T) {
-		mockRepo.On("FindByEmail", mock.Anything, "unknown").Return(nil, domainerr.ErrUserNotFound).Once()
-		err := service.ResetPassword(ctx, "unknown", "123", "pass")
-		assert.Error(t, err)
-	})
-
-	t.Run("ResetPassword_UpdateError", func(t *testing.T) {
-		token := "123456"
-		exp := time.Now().Add(time.Hour)
-		userWithToken := *user
-		userWithToken.Auth = &models.Auth{
-			BaseModel:                 models.BaseModel{ID: "auth-1"},
-			RequestPasswordToken:      &token,
-			RequestPasswordExpiration: &exp,
-		}
-
-		mockRepo.On("FindByEmail", mock.Anything, emailStr).Return(&userWithToken, nil).Twice()
-		mockRepo.On("UpdateAuth", mock.Anything, "auth-1", mock.Anything).Return(errors.New("db error")).Once()
-
-		err := service.ResetPassword(ctx, emailStr, token, "newPassword")
-		assert.Error(t, err)
-	})
-
-	t.Run("generateRandom6DigitToken_Error", func(t *testing.T) {
-		oldReader := randReader
-		randReader = iotest.ErrReader(errors.New("rand error"))
-		defer func() { randReader = oldReader }()
-
-		_, err := generateRandom6DigitToken()
-		assert.Error(t, err)
-	})
-	t.Run("ValidateResetToken_UserNotFound", func(t *testing.T) {
-		mockRepo.On("FindByEmail", mock.Anything, "unknown@test.com").Return(nil, domainerr.ErrUserNotFound).Once()
-
-		valid, err := service.ValidateResetToken(ctx, "unknown@test.com", "123")
-		assert.Error(t, err)
-		assert.False(t, valid)
-		assert.Equal(t, domainerr.ErrUserNotFound, err)
-	})
-
-	t.Run("ResetPassword_ValidationError", func(t *testing.T) {
-		mockRepo.On("FindByEmail", mock.Anything, emailStr).Return(user, nil).Once()
-		// ValidateResetToken will be called and it will call FindByEmail again
-		mockRepo.On("FindByEmail", mock.Anything, emailStr).Return(user, nil).Once()
-
-		err := service.ResetPassword(ctx, emailStr, "wrong-token", "newPass")
-		assert.Error(t, err)
-		assert.Equal(t, domainerr.ErrInvalidToken, err)
-	})
-
-	t.Run("ResetPassword_HashError", func(t *testing.T) {
-		token := "123456"
-		exp := time.Now().Add(time.Hour)
-		userWithToken := *user
-		userWithToken.Auth = &models.Auth{
-			BaseModel:                 models.BaseModel{ID: "auth-1"},
-			RequestPasswordToken:      &token,
-			RequestPasswordExpiration: &exp,
-		}
-
-		mockRepo.On("FindByEmail", mock.Anything, emailStr).Return(&userWithToken, nil).Twice()
-
-		service.HashPassword = func(password string) (string, error) {
-			return "", errors.New("hash error")
-		}
-		defer func() { service.HashPassword = security.HashPassword }()
-
-		err := service.ResetPassword(ctx, emailStr, token, "pass")
-		assert.Error(t, err)
-		assert.Equal(t, domainerr.ErrInternal, err)
+		ver, _ := cache.RedisClient.Get(ctx, versionKey).Int()
+		assert.Equal(t, 1, ver)
 	})
 }

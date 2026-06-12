@@ -9,9 +9,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
-	"backend-go/pkg/cache"
-	"backend-go/pkg/config"
-	"backend-go/pkg/security"
+	"github.com/teilorbarcelos/auth-service-go/pkg/cache"
+	"github.com/teilorbarcelos/auth-service-go/pkg/config"
+	"github.com/teilorbarcelos/auth-service-go/pkg/security"
 )
 
 var ctxBg = context.Background()

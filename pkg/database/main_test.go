@@ -6,8 +6,8 @@ import (
 	"os"
 	"testing"
 
-	"backend-go/pkg/config"
-	"backend-go/pkg/testutil"
+	"github.com/teilorbarcelos/auth-service-go/pkg/config"
+	"github.com/teilorbarcelos/auth-service-go/pkg/testutil"
 	"gorm.io/gorm"
 )
 

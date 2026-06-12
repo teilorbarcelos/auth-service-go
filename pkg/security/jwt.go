@@ -3,7 +3,7 @@ package security
 import (
 	"time"
 
-	"backend-go/pkg/config"
+	"github.com/teilorbarcelos/auth-service-go/pkg/config"
 
 	"github.com/golang-jwt/jwt/v5"
 )

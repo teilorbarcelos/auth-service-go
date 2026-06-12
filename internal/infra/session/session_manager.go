@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	"backend-go/pkg/cache"
+	"github.com/teilorbarcelos/auth-service-go/pkg/cache"
 )
 
 const sessionVersionKeyFormat = "session:ver:%s"

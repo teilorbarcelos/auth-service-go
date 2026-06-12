@@ -6,8 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"backend-go/pkg/cache"
-	"backend-go/pkg/config"
+	"github.com/teilorbarcelos/auth-service-go/pkg/cache"
+	"github.com/teilorbarcelos/auth-service-go/pkg/config"
 
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"

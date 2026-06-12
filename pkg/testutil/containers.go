@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"backend-go/internal/core/models"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
 
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
@@ -38,16 +38,19 @@ var (
 		return gorm.Open(dialector, config)
 	}
 	autoMigrate = func(ctx context.Context, db *gorm.DB) error {
-		db.Exec("CREATE SCHEMA IF NOT EXISTS audit")
 		return db.WithContext(ctx).AutoMigrate(
-			&models.AuditLog{},
 			&models.Role{},
 			&models.Feature{},
 			&models.RoleFeature{},
 			&models.Auth{},
 			&models.User{},
-			&models.Product{},
 		)
+	}
+	postgresRunContainer = func(ctx context.Context, img string, opts ...testcontainers.ContainerCustomizer) (*postgres.PostgresContainer, error) {
+		return postgres.Run(ctx, img, opts...)
+	}
+	redisRunContainer = func(ctx context.Context, img string, opts ...testcontainers.ContainerCustomizer) (*redis.RedisContainer, error) {
+		return redis.Run(ctx, img, opts...)
 	}
 )
 
@@ -57,7 +60,7 @@ func SetupPostgresContainer(ctx context.Context) (*PostgresContainer, error) {
 	dbUser := "postgres"
 	dbPassword := "postgres"
 
-	pgContainer, err := postgres.Run(ctx,
+	pgContainer, err := postgresRunContainer(ctx,
 		"postgres:16-alpine",
 		postgres.WithDatabase(dbName),
 		postgres.WithUsername(dbUser),
@@ -99,7 +102,7 @@ func SetupPostgresContainer(ctx context.Context) (*PostgresContainer, error) {
 }
 
 func SetupRedisContainer(ctx context.Context) (*RedisContainer, error) {
-	redisContainer, err := redis.Run(ctx,
+	redisContainer, err := redisRunContainer(ctx,
 		"redis:7-alpine",
 		testcontainers.WithWaitStrategy(
 			wait.ForLog("Ready to accept connections"),

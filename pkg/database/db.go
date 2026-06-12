@@ -6,11 +6,11 @@ import (
 	"strconv"
 	"time"
 
-	"backend-go/pkg/logger"
-	"backend-go/pkg/retry"
+	"github.com/teilorbarcelos/auth-service-go/pkg/logger"
+	"github.com/teilorbarcelos/auth-service-go/pkg/retry"
 
-	"backend-go/internal/core/models"
-	"backend-go/pkg/config"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
+	"github.com/teilorbarcelos/auth-service-go/pkg/config"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/stdlib"
@@ -57,7 +57,7 @@ func ConnectDB() {
 			SingularTable: true,
 		},
 		PrepareStmt: true,
-		NowFunc:     func() time.Time { return time.Now().UTC() },
+		NowFunc:     time.Now,
 	}
 
 	if config.AppConfig.Environment == "production" {
@@ -101,24 +101,18 @@ func ConnectDB() {
 		runMigrations()
 	} else {
 		logger.Info("Rodando AutoMigrate...")
-		DB.Exec("CREATE SCHEMA IF NOT EXISTS audit")
 		err = dbAutoMigrate(
 			DB,
-			&models.AuditLog{},
-			&models.ErrorLog{},
 			&models.Role{},
 			&models.Feature{},
 			&models.RoleFeature{},
 			&models.Auth{},
 			&models.User{},
-			&models.Product{},
 		)
 		if err != nil {
 			logFatalf("Erro no AutoMigrate: %v", err)
 		}
 	}
-
-	RunSeed(DB)
 
 	logger.Info("Conexão com PostgreSQL estabelecida com sucesso.")
 }

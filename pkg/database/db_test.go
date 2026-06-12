@@ -8,8 +8,9 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"backend-go/pkg/config"
-	"backend-go/pkg/retry"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/models"
+	"github.com/teilorbarcelos/auth-service-go/pkg/config"
+	"github.com/teilorbarcelos/auth-service-go/pkg/retry"
 	"gorm.io/gorm"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -50,9 +51,14 @@ func TestConnectDB(t *testing.T) {
 	t.Run("Success in test mode", func(t *testing.T) {
 		config.AppConfig.Environment = "test"
 		gormOpen = gorm.Open
-		dbAutoMigrate = func(db *gorm.DB, dst ...interface{}) error { return nil }
 		logFatalf = origFatalf
-		
+
+		// Cover the default dbAutoMigrate function body
+		err := dbAutoMigrate(testDB, &models.Role{}, &models.Feature{}, &models.RoleFeature{}, &models.Auth{}, &models.User{})
+		assert.NoError(t, err)
+
+		dbAutoMigrate = func(db *gorm.DB, dst ...interface{}) error { return nil }
+
 		ConnectDB()
 		assert.NotNil(t, DB)
 	})
@@ -130,6 +136,16 @@ func TestDefaultRunMigrations(t *testing.T) {
 		migrateNew = origMigrateNew
 		logFatalf = origFatalf
 	}()
+
+	// Cover the default migrateNew function body
+	tmpDir := t.TempDir()
+	err := os.WriteFile(filepath.Join(tmpDir, "000001_test.up.sql"), []byte("SELECT 1;"), 0644)
+	if err == nil {
+		m, migrateErr := migrateNew("file://"+tmpDir, config.AppConfig.DBUrl)
+		if migrateErr == nil {
+			_ = m.Up()
+		}
+	}
 
 	t.Run("Success or No Change", func(t *testing.T) {
 		migrateNew = func(sourceURL, databaseURL string) (migrator, error) {

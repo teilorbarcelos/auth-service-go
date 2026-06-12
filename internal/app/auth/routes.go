@@ -1,14 +1,14 @@
 package auth
 
 import (
-	"backend-go/internal/infra/session"
+	"github.com/teilorbarcelos/auth-service-go/internal/infra/session"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 func RegisterRoutes(publicRG *gin.RouterGroup, protectedRG *gin.RouterGroup, db *gorm.DB) {
-	repo := NewRepository(db)
 	sm := session.NewSessionManager()
+	repo := NewRepository(db)
 	svc := NewService(repo, sm)
 	h := NewHandler(svc)
 
@@ -16,9 +16,8 @@ func RegisterRoutes(publicRG *gin.RouterGroup, protectedRG *gin.RouterGroup, db 
 	{
 		authGroup.POST("/login", h.Login)
 		authGroup.POST("/refresh", h.Refresh)
-		authGroup.POST("/password/request", h.ForgotPassword)
-		authGroup.POST("/password/validate", h.ValidateToken)
-		authGroup.POST("/password/change", h.ResetPassword)
+		authGroup.GET("/.well-known/jwks.json", h.JWKS)
 	}
+	protectedRG.POST("/auth/logout", h.Logout)
 	protectedRG.GET("/auth/me", h.Me)
 }

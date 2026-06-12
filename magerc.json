@@ -76,7 +76,7 @@
   "replacements": [
     {
       "path": "go.mod",
-      "pattern": "github.com/teilorbarcelos/backend-go"
+      "pattern": "github.com/teilorbarcelos/auth-service-go"
     }
   ]
 }

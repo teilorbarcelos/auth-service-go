@@ -26,7 +26,7 @@ func TestLoadConfig(t *testing.T) {
 		
 		// Verify some default values are set
 		assert.NotEmpty(t, AppConfig.Environment)
-		assert.Equal(t, "3000", AppConfig.Port)
+		assert.Equal(t, "8001", AppConfig.Port)
 		assert.Equal(t, "0.0.0.0", AppConfig.Host)
 	})
 

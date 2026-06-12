@@ -12,7 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
-	"backend-go/internal/core/domainerr"
+	"github.com/teilorbarcelos/auth-service-go/internal/core/domainerr"
 )
 
 type MockAuthService struct {
@@ -43,18 +43,8 @@ func (m *MockAuthService) RefreshToken(ctx context.Context, refreshToken string)
 	return args.Get(0).(*LoginResponse), args.Error(1)
 }
 
-func (m *MockAuthService) RequestPasswordReset(ctx context.Context, email string) error {
-	args := m.Called(ctx, email)
-	return args.Error(0)
-}
-
-func (m *MockAuthService) ValidateResetToken(ctx context.Context, email, token string) (bool, error) {
-	args := m.Called(ctx, email, token)
-	return args.Bool(0), args.Error(1)
-}
-
-func (m *MockAuthService) ResetPassword(ctx context.Context, email, token, newPassword string) error {
-	args := m.Called(ctx, email, token, newPassword)
+func (m *MockAuthService) Logout(ctx context.Context, userID string) error {
+	args := m.Called(ctx, userID)
 	return args.Error(0)
 }
 
@@ -245,19 +235,21 @@ func TestAuthHandler_Refresh(t *testing.T) {
 	})
 }
 
-func TestAuthHandler_ForgotPassword(t *testing.T) {
+func TestAuthHandler_Logout(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	t.Run("Success", func(t *testing.T) {
 		mockSvc := new(MockAuthService)
 		h := NewHandler(mockSvc)
 		r := gin.Default()
-		r.POST("/forgot-password", h.ForgotPassword)
+		r.POST("/logout", func(c *gin.Context) {
+			c.Set("userID", "user-123")
+			h.Logout(c)
+		})
 
-		mockSvc.On("RequestPasswordReset", mock.Anything, "test@test.com").Return(nil)
+		mockSvc.On("Logout", mock.Anything, "user-123").Return(nil)
 
-		body, _ := json.Marshal(ForgotPasswordRequest{Email: "test@test.com"})
-		req, _ := http.NewRequest("POST", "/forgot-password", bytes.NewBuffer(body))
+		req, _ := http.NewRequest("POST", "/logout", nil)
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
 
@@ -265,116 +257,49 @@ func TestAuthHandler_ForgotPassword(t *testing.T) {
 		mockSvc.AssertExpectations(t)
 	})
 
-	t.Run("Invalid JSON", func(t *testing.T) {
+	t.Run("No UserID in Context", func(t *testing.T) {
 		mockSvc := new(MockAuthService)
 		h := NewHandler(mockSvc)
 		r := gin.Default()
-		r.POST("/forgot-password", h.ForgotPassword)
+		r.POST("/logout", h.Logout)
 
-		req, _ := http.NewRequest("POST", "/forgot-password", bytes.NewBufferString("invalid"))
-		w := httptest.NewRecorder()
-		r.ServeHTTP(w, req)
-
-		assert.Equal(t, http.StatusBadRequest, w.Code)
-	})
-}
-
-func TestAuthHandler_ValidateToken(t *testing.T) {
-	gin.SetMode(gin.TestMode)
-
-	t.Run("Success", func(t *testing.T) {
-		mockSvc := new(MockAuthService)
-		h := NewHandler(mockSvc)
-		r := gin.Default()
-		r.POST("/validate-token", h.ValidateToken)
-
-		mockSvc.On("ValidateResetToken", mock.Anything, "test@test.com", "123456").Return(true, nil)
-
-		body, _ := json.Marshal(ValidateTokenRequest{Email: "test@test.com", Token: "123456"})
-		req, _ := http.NewRequest("POST", "/validate-token", bytes.NewBuffer(body))
-		w := httptest.NewRecorder()
-		r.ServeHTTP(w, req)
-
-		assert.Equal(t, http.StatusOK, w.Code)
-		mockSvc.AssertExpectations(t)
-	})
-
-	t.Run("Invalid Token", func(t *testing.T) {
-		mockSvc := new(MockAuthService)
-		h := NewHandler(mockSvc)
-		r := gin.Default()
-		r.POST("/validate-token", h.ValidateToken)
-
-		mockSvc.On("ValidateResetToken", mock.Anything, "test@test.com", "wrong").Return(false, domainerr.ErrInvalidToken)
-
-		body, _ := json.Marshal(ValidateTokenRequest{Email: "test@test.com", Token: "wrong"})
-		req, _ := http.NewRequest("POST", "/validate-token", bytes.NewBuffer(body))
+		req, _ := http.NewRequest("POST", "/logout", nil)
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
 
 		assert.Equal(t, http.StatusUnauthorized, w.Code)
 	})
 
-	t.Run("Invalid JSON", func(t *testing.T) {
+	t.Run("Service Error", func(t *testing.T) {
 		mockSvc := new(MockAuthService)
 		h := NewHandler(mockSvc)
 		r := gin.Default()
-		r.POST("/validate-token", h.ValidateToken)
+		r.POST("/logout", func(c *gin.Context) {
+			c.Set("userID", "user-123")
+			h.Logout(c)
+		})
 
-		req, _ := http.NewRequest("POST", "/validate-token", bytes.NewBufferString("invalid"))
+		mockSvc.On("Logout", mock.Anything, "user-123").Return(errors.New("service error"))
+
+		req, _ := http.NewRequest("POST", "/logout", nil)
 		w := httptest.NewRecorder()
 		r.ServeHTTP(w, req)
 
-		assert.Equal(t, http.StatusBadRequest, w.Code)
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
 	})
 }
 
-func TestAuthHandler_ResetPassword(t *testing.T) {
+func TestAuthHandler_JWKS(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
-	t.Run("Success", func(t *testing.T) {
-		mockSvc := new(MockAuthService)
-		h := NewHandler(mockSvc)
-		r := gin.Default()
-		r.POST("/reset-password", h.ResetPassword)
+	mockSvc := new(MockAuthService)
+	h := NewHandler(mockSvc)
+	r := gin.Default()
+	r.GET("/.well-known/jwks.json", h.JWKS)
 
-		mockSvc.On("ResetPassword", mock.Anything, "test@test.com", "123456", "newPass").Return(nil)
+	req, _ := http.NewRequest("GET", "/.well-known/jwks.json", nil)
+	w := httptest.NewRecorder()
+	r.ServeHTTP(w, req)
 
-		body, _ := json.Marshal(ResetPasswordRequest{Email: "test@test.com", Token: "123456", Password: "newPass"})
-		req, _ := http.NewRequest("POST", "/reset-password", bytes.NewBuffer(body))
-		w := httptest.NewRecorder()
-		r.ServeHTTP(w, req)
-
-		assert.Equal(t, http.StatusOK, w.Code)
-		mockSvc.AssertExpectations(t)
-	})
-
-	t.Run("Token Expired", func(t *testing.T) {
-		mockSvc := new(MockAuthService)
-		h := NewHandler(mockSvc)
-		r := gin.Default()
-		r.POST("/reset-password", h.ResetPassword)
-
-		mockSvc.On("ResetPassword", mock.Anything, "test@test.com", "123456", "newPass").Return(domainerr.ErrTokenExpired)
-
-		body, _ := json.Marshal(ResetPasswordRequest{Email: "test@test.com", Token: "123456", Password: "newPass"})
-		req, _ := http.NewRequest("POST", "/reset-password", bytes.NewBuffer(body))
-		w := httptest.NewRecorder()
-		r.ServeHTTP(w, req)
-
-		assert.Equal(t, http.StatusUnauthorized, w.Code)
-	})
-
-	t.Run("Invalid JSON", func(t *testing.T) {
-		mockSvc := new(MockAuthService)
-		h := NewHandler(mockSvc)
-		r := gin.Default()
-		r.POST("/reset-password", h.ResetPassword)
-
-		req, _ := http.NewRequest("POST", "/reset-password", bytes.NewBufferString("invalid"))
-		w := httptest.NewRecorder()
-		r.ServeHTTP(w, req)
-
-		assert.Equal(t, http.StatusBadRequest, w.Code)
-	})
+	assert.Equal(t, http.StatusOK, w.Code)
 }

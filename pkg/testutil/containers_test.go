@@ -2,178 +2,134 @@ package testutil
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"testing"
-	"time"
 
-	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
+	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/modules/postgres"
-	testcontainersredis "github.com/testcontainers/testcontainers-go/modules/redis"
+	"github.com/testcontainers/testcontainers-go/modules/redis"
 	"gorm.io/gorm"
 )
 
-func TestSetupPostgresContainer(t *testing.T) {
-	t.Run("Error - Already Cancelled Context", func(t *testing.T) {
-		ctx, cancel := context.WithCancel(context.Background())
-		cancel()
-		container, err := SetupPostgresContainer(ctx)
-		assert.Error(t, err)
-		assert.Nil(t, container)
-	})
+func TestSetupPostgresContainer_ErrorPaths(t *testing.T) {
+	ctx := context.Background()
 
-	t.Run("Error - Timeout during setup", func(t *testing.T) {
-		if testing.Short() {
-			t.Skip("skipping test in short mode.")
+	t.Run("postgres.Run error", func(t *testing.T) {
+		orig := postgresRunContainer
+		postgresRunContainer = func(ctx context.Context, img string, opts ...testcontainers.ContainerCustomizer) (*postgres.PostgresContainer, error) {
+			return nil, errors.New("container error")
 		}
-		// A very short timeout that is already expired
-		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Microsecond)
-		defer cancel()
-		time.Sleep(10 * time.Millisecond)
+		defer func() { postgresRunContainer = orig }()
 
-		container, err := SetupPostgresContainer(ctx)
-		assert.Error(t, err)
-		assert.Nil(t, container)
+		pg, err := SetupPostgresContainer(ctx)
+		assert.Nil(t, pg)
+		assert.ErrorContains(t, err, "container error")
 	})
 
-	t.Run("Error - ConnectionString failure", func(t *testing.T) {
-		// Mock ConnectionString to return an error
-		old := postgresConnectionString
+	t.Run("postgresConnectionString error", func(t *testing.T) {
+		origRun := postgresRunContainer
+		postgresRunContainer = func(ctx context.Context, img string, opts ...testcontainers.ContainerCustomizer) (*postgres.PostgresContainer, error) {
+			return &postgres.PostgresContainer{}, nil
+		}
+		defer func() { postgresRunContainer = origRun }()
+
+		origConnStr := postgresConnectionString
 		postgresConnectionString = func(ctx context.Context, c *postgres.PostgresContainer) (string, error) {
-			return "", fmt.Errorf("forced connection string error")
+			return "", errors.New("conn string error")
 		}
-		defer func() { postgresConnectionString = old }()
+		defer func() { postgresConnectionString = origConnStr }()
 
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
-		defer cancel()
-
-		container, err := SetupPostgresContainer(ctx)
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "forced connection string error")
-		assert.Nil(t, container)
+		pg, err := SetupPostgresContainer(ctx)
+		assert.Nil(t, pg)
+		assert.ErrorContains(t, err, "conn string error")
 	})
 
-	t.Run("Error - Gorm Open failure", func(t *testing.T) {
-		// Mock gormOpen to return an error
-		old := gormOpen
+	t.Run("gormOpen error", func(t *testing.T) {
+		origRun := postgresRunContainer
+		postgresRunContainer = func(ctx context.Context, img string, opts ...testcontainers.ContainerCustomizer) (*postgres.PostgresContainer, error) {
+			return &postgres.PostgresContainer{}, nil
+		}
+		defer func() { postgresRunContainer = origRun }()
+
+		origConnStr := postgresConnectionString
+		postgresConnectionString = func(ctx context.Context, c *postgres.PostgresContainer) (string, error) {
+			return "postgres://localhost:5432/test?sslmode=disable", nil
+		}
+		defer func() { postgresConnectionString = origConnStr }()
+
+		origGorm := gormOpen
 		gormOpen = func(dialector gorm.Dialector, config *gorm.Config) (*gorm.DB, error) {
-			return nil, fmt.Errorf("forced gorm open error")
+			return nil, errors.New("gorm error")
 		}
-		defer func() { gormOpen = old }()
+		defer func() { gormOpen = origGorm }()
 
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
-		defer cancel()
-
-		container, err := SetupPostgresContainer(ctx)
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "forced gorm open error")
-		assert.Nil(t, container)
+		pg, err := SetupPostgresContainer(ctx)
+		assert.Nil(t, pg)
+		assert.ErrorContains(t, err, "gorm error")
 	})
 
-	t.Run("Error - AutoMigrate failure", func(t *testing.T) {
-		// Mock autoMigrate to return an error
-		old := autoMigrate
+	t.Run("autoMigrate error", func(t *testing.T) {
+		origRun := postgresRunContainer
+		postgresRunContainer = func(ctx context.Context, img string, opts ...testcontainers.ContainerCustomizer) (*postgres.PostgresContainer, error) {
+			return &postgres.PostgresContainer{}, nil
+		}
+		defer func() { postgresRunContainer = origRun }()
+
+		origConnStr := postgresConnectionString
+		postgresConnectionString = func(ctx context.Context, c *postgres.PostgresContainer) (string, error) {
+			return "postgres://localhost:5432/test?sslmode=disable", nil
+		}
+		defer func() { postgresConnectionString = origConnStr }()
+
+		origGorm := gormOpen
+		gormOpen = func(dialector gorm.Dialector, config *gorm.Config) (*gorm.DB, error) {
+			return &gorm.DB{}, nil
+		}
+		defer func() { gormOpen = origGorm }()
+
+		origMigrate := autoMigrate
 		autoMigrate = func(ctx context.Context, db *gorm.DB) error {
-			return fmt.Errorf("forced automigrate error")
+			return errors.New("migrate error")
 		}
-		defer func() { autoMigrate = old }()
+		defer func() { autoMigrate = origMigrate }()
 
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
-		defer cancel()
-
-		container, err := SetupPostgresContainer(ctx)
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "falha no automigrate de teste: forced automigrate error")
-		assert.Nil(t, container)
-	})
-
-	t.Run("Success", func(t *testing.T) {
-		if testing.Short() {
-			t.Skip("skipping test in short mode.")
-		}
-
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
-		defer cancel()
-
-		container, err := SetupPostgresContainer(ctx)
-		assert.NoError(t, err)
-		assert.NotNil(t, container)
-		assert.NotNil(t, container.DB)
-
-		// Verify DB is working
-		var result int
-		err = container.DB.Raw("SELECT 1").Scan(&result).Error
-		assert.NoError(t, err)
-		assert.Equal(t, 1, result)
-
-		err = container.Terminate(ctx)
-		assert.NoError(t, err)
+		pg, err := SetupPostgresContainer(ctx)
+		assert.Nil(t, pg)
+		assert.ErrorContains(t, err, "migrate error")
 	})
 }
 
-func TestSetupRedisContainer(t *testing.T) {
-	t.Run("Error - Already Cancelled Context", func(t *testing.T) {
-		ctx, cancel := context.WithCancel(context.Background())
-		cancel()
-		container, err := SetupRedisContainer(ctx)
-		assert.Error(t, err)
-		assert.Nil(t, container)
+func TestSetupRedisContainer_ErrorPaths(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("redis.Run error", func(t *testing.T) {
+		orig := redisRunContainer
+		redisRunContainer = func(ctx context.Context, img string, opts ...testcontainers.ContainerCustomizer) (*redis.RedisContainer, error) {
+			return nil, errors.New("container error")
+		}
+		defer func() { redisRunContainer = orig }()
+
+		rd, err := SetupRedisContainer(ctx)
+		assert.Nil(t, rd)
+		assert.ErrorContains(t, err, "container error")
 	})
 
-	t.Run("Error - Timeout during setup", func(t *testing.T) {
-		if testing.Short() {
-			t.Skip("skipping test in short mode.")
+	t.Run("redisConnectionString error", func(t *testing.T) {
+		origRun := redisRunContainer
+		redisRunContainer = func(ctx context.Context, img string, opts ...testcontainers.ContainerCustomizer) (*redis.RedisContainer, error) {
+			return &redis.RedisContainer{}, nil
 		}
-		// A very short timeout that is already expired
-		ctx, cancel := context.WithTimeout(context.Background(), 1*time.Microsecond)
-		defer cancel()
-		time.Sleep(10 * time.Millisecond)
+		defer func() { redisRunContainer = origRun }()
 
-		container, err := SetupRedisContainer(ctx)
-		assert.Error(t, err)
-		assert.Nil(t, container)
-	})
-
-	t.Run("Error - ConnectionString failure", func(t *testing.T) {
-		// Mock ConnectionString to return an error
-		old := redisConnectionString
-		redisConnectionString = func(ctx context.Context, c *testcontainersredis.RedisContainer) (string, error) {
-			return "", fmt.Errorf("forced redis connection string error")
+		origConnStr := redisConnectionString
+		redisConnectionString = func(ctx context.Context, c *redis.RedisContainer) (string, error) {
+			return "", errors.New("conn string error")
 		}
-		defer func() { redisConnectionString = old }()
+		defer func() { redisConnectionString = origConnStr }()
 
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
-		defer cancel()
-
-		container, err := SetupRedisContainer(ctx)
-		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "forced redis connection string error")
-		assert.Nil(t, container)
-	})
-
-	t.Run("Success", func(t *testing.T) {
-		if testing.Short() {
-			t.Skip("skipping test in short mode.")
-		}
-
-		ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
-		defer cancel()
-
-		container, err := SetupRedisContainer(ctx)
-		assert.NoError(t, err)
-		assert.NotNil(t, container)
-		assert.NotEmpty(t, container.URI)
-
-		// Verify Redis is working
-		opts, err := redis.ParseURL(container.URI)
-		assert.NoError(t, err)
-		client := redis.NewClient(opts)
-		defer client.Close()
-
-		err = client.Ping(ctx).Err()
-		assert.NoError(t, err)
-
-		err = container.Terminate(ctx)
-		assert.NoError(t, err)
+		rd, err := SetupRedisContainer(ctx)
+		assert.Nil(t, rd)
+		assert.ErrorContains(t, err, "conn string error")
 	})
 }

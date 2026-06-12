@@ -3,7 +3,7 @@ package middleware
 import (
 	"time"
 
-	"backend-go/pkg/logger"
+	"github.com/teilorbarcelos/auth-service-go/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"

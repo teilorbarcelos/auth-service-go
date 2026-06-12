@@ -1,7 +1,7 @@
 package config
 
 import (
-	"backend-go/pkg/logger"
+	"github.com/teilorbarcelos/auth-service-go/pkg/logger"
 
 	"github.com/spf13/viper"
 )
@@ -45,7 +45,7 @@ func LoadConfig() {
 	viper.AutomaticEnv()
 
 	viper.SetDefault("ENVIRONMENT", "development")
-	viper.SetDefault("PORT", "3000")
+	viper.SetDefault("PORT", "8001")
 	viper.SetDefault("HOST", "0.0.0.0")
 	viper.SetDefault("RATE_LIMIT_MAX", 100)
 	viper.SetDefault("RATE_LIMIT_WINDOW", "1m")
@@ -53,13 +53,13 @@ func LoadConfig() {
 	viper.SetDefault("REDIS_URL", "redis://localhost:6379")
 	viper.SetDefault("FIRST_USER", "admin@email.com")
 	viper.SetDefault("FIRST_PASSWORD", "admin@123") // NOSONAR
-	viper.SetDefault("PDF_SERVICE_URL", "http://localhost:8889")
+	
 	viper.SetDefault("DB_MAX_OPEN_CONNS", 50)
 	viper.SetDefault("DB_MAX_IDLE_CONNS", 10)
 	viper.SetDefault("DB_CONN_MAX_LIFETIME", "30m")
 	viper.SetDefault("DB_CONN_MAX_IDLE_TIME", "5m")
-	viper.SetDefault("JWT_ISSUER", "backend-go")
-	viper.SetDefault("JWT_AUDIENCE", "backend-go-api")
+	viper.SetDefault("JWT_ISSUER", "auth-service-go")
+	viper.SetDefault("JWT_AUDIENCE", "auth-service-go-api")
 	viper.SetDefault("TRUSTED_PROXIES", "")
 	viper.SetDefault("JWT_ACCESS_EXPIRY", "15m")
 	viper.SetDefault("JWT_REFRESH_EXPIRY", "168h")
